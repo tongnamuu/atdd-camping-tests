@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/auth/login"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "Set-Cookie": "AUTH_TOKEN=test-token; Path=/"
+    },
+    "jsonBody": {
+      "token": "test-token"
+    }
+  }
+}

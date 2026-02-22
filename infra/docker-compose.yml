@@ -1,0 +1,73 @@
+name: atdd
+
+networks:
+  atdd-net:
+    name: atdd-net
+    external: false
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: atdd-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=atdd
+      - MYSQL_ROOT_HOST=%
+    ports:
+      - "3306:3306"
+    networks:
+      - atdd-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-psecret"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    command: ["mysqld", "--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  wiremock:
+    image: wiremock/wiremock:3.3.1
+    container_name: atdd-wiremock
+    ports:
+      - "9000:8080"
+    volumes:
+      - ./wiremock:/home/wiremock
+    networks:
+      - atdd-net
+
+  payments:
+    build:
+      context: ../../atdd-camping-payments
+      dockerfile: Dockerfile
+    container_name: atdd-payments
+    ports:
+      - "9090:9090"
+    networks:
+      - atdd-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9090/v1/payments > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  kiosk:
+    build:
+      context: ../../atdd-camping-kiosk
+      dockerfile: Dockerfile
+    container_name: atdd-kiosk
+    ports:
+      - "8080:8080"
+    environment:
+      - KIOSK_ADMIN_BASE_URL=http://wiremock:8080
+      - KIOSK_PAYMENT_BASE_URL=http://payments:9090
+    networks:
+      - atdd-net
+    depends_on:
+      - payments
+      - wiremock
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:8080/ > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10

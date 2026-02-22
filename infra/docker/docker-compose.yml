@@ -1,0 +1,26 @@
+name: atdd-smoke
+
+networks:
+  smoke-net:
+    name: smoke-net
+    external: false
+
+services:
+  kiosk:
+    build:
+      context: ../../../atdd-camping-kiosk
+      dockerfile: Dockerfile-kiosk
+    container_name: atdd-kiosk-smoke
+    ports:
+      - "8080:8080"
+    environment:
+      - KIOSK_ADMIN_BASE_URL=http://localhost:9000
+      - KIOSK_PAYMENT_BASE_URL=http://localhost:9090
+    networks:
+      - smoke-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 30s

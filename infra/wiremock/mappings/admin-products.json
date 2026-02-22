@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/admin/products"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {"id": 1, "name": "랜턴", "price": 30000, "stockQuantity": 20, "productType": "RENTAL"},
+      {"id": 2, "name": "장작팩", "price": 10000, "stockQuantity": 50, "productType": "SALE"},
+      {"id": 3, "name": "코펠 세트", "price": 20000, "stockQuantity": 15, "productType": "RENTAL"},
+      {"id": 4, "name": "의자", "price": 15000, "stockQuantity": 25, "productType": "RENTAL"},
+      {"id": 8, "name": "생수(2L)", "price": 2000, "stockQuantity": 100, "productType": "SALE"},
+      {"id": 9, "name": "라면 세트", "price": 4000, "stockQuantity": 80, "productType": "SALE"}
+    ]
+  }
+}
